@@ -25,6 +25,7 @@ int processInput(FILE *inputFile, FILE *outputFile) {
 	    }
             else{
 		fprintf(outputFile,"\r");
+		fprintf(outputFile,"%c",c);
 	    }
         }
         else{
