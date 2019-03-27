@@ -20,13 +20,13 @@ int processInput(FILE *inputFile, FILE *outputFile) {
     int c;
     while((c=fgetc(inputFile))!=EOF){
         if(c=='\r'){
-	    if((c=fgetc(inputFile))=='\n'){
-		fprintf(outputFile,"\n");
-	    }
-            else{
-		fprintf(outputFile,"\r");
-		fprintf(outputFile,"%c",c);
-	    }
+        	if((c=fgetc(inputFile))=='\n'){
+        		fprintf(outputFile,"\n");
+        	}
+        	else{
+        		fprintf(outputFile,"\r");
+        		fprintf(outputFile,"%c",c);
+        	}
         }
         else{
             fprintf(outputFile,"%c",c);
@@ -86,14 +86,11 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'o':
-                // verifico si existe el archivo
-                if (access(optarg, W_OK) != -1) {
-                    outputFile = fopen(optarg, "w+");
-                    if (outputFile == NULL) {
-                        fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
-                        return ERROR;
-                    }
-                }
+            	outputFile = fopen(optarg, "w+");
+				if (outputFile == NULL) {
+					fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
+					return ERROR;
+				}
                 break;
             default:
                 // así está en el manual de getopt

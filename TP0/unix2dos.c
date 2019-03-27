@@ -26,7 +26,6 @@ int processInput(FILE *inputFile, FILE *outputFile) {
             fprintf(outputFile,"%c",c);
         }
     }
-
     if(fclose(inputFile)==EOF){
         fprintf(stderr, "Error fclose: %s\n", strerror( errno ));
         return ERROR;
@@ -80,14 +79,11 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'o':
-                // verifico si existe el archivo
-                if (access(optarg, W_OK) != -1) {
-                    outputFile = fopen(optarg, "w+");
-                    if (outputFile == NULL) {
-                        fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
-                        return ERROR;
-                    }
-                }
+				outputFile = fopen(optarg, "w+");
+				if (outputFile == NULL) {
+					fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
+					return ERROR;
+				}
                 break;
             default:
                 // así está en el manual de getopt
