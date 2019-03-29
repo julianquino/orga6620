@@ -19,8 +19,14 @@
 int processInput(FILE *inputFile, FILE *outputFile) {
     int c;
     while((c=fgetc(inputFile))!=EOF){
-        if(c=='\n'){
-            fprintf(outputFile,"\r\n");
+        if(c=='\r'){
+            if((c=fgetc(inputFile))=='\n'){
+            	fprintf(outputFile,"\r\n");
+            }else{
+            	fprintf(outputFile,"\r");
+            }
+        }else if(c=='\n'){
+        	fprintf(outputFile,"\r\n");
         }
         else{
             fprintf(outputFile,"%c",c);
@@ -73,17 +79,21 @@ int main(int argc, char *argv[]) {
                 printf("	-i, --input    Location of the input file. \n");
                 return 0;
             case 'i':
-                inputFile = fopen(optarg, "r");
-                if (inputFile == NULL) {
-                	fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
-                }
+            	if(strcmp(optarg, "-") != 0){
+					inputFile = fopen(optarg, "r");
+					if (inputFile == NULL) {
+						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
+					}
+            	}
                 break;
             case 'o':
-				outputFile = fopen(optarg, "w+");
-				if (outputFile == NULL) {
-					fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
-					return ERROR;
-				}
+            	if(strcmp(optarg, "-") != 0){
+					outputFile = fopen(optarg, "w+");
+					if (outputFile == NULL) {
+						fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
+						return ERROR;
+					}
+            	}
                 break;
             default:
                 // así está en el manual de getopt

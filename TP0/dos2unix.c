@@ -80,17 +80,21 @@ int main(int argc, char *argv[]) {
                 printf("	-i, --input    Location of the input file. \n");
                 return 0;
             case 'i':
-                inputFile = fopen(optarg, "r");
-                if (inputFile == NULL) {
-                	fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
-                }
+            	if(strcmp(optarg, "-") != 0){
+					inputFile = fopen(optarg, "r");
+					if (inputFile == NULL) {
+						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
+					}
+            	}
                 break;
             case 'o':
-            	outputFile = fopen(optarg, "w+");
-				if (outputFile == NULL) {
-					fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
-					return ERROR;
-				}
+            	if(strcmp(optarg, "-") != 0){
+					outputFile = fopen(optarg, "w+");
+					if (outputFile == NULL) {
+						fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
+						return ERROR;
+					}
+            	}
                 break;
             default:
                 // así está en el manual de getopt
