@@ -22,7 +22,7 @@
 \autor{Del Carril, Manuel}{100772}{manueldelcarril@gmail.com}
 \autor{Bobadilla Catalan, German}{90123}{bobadillagerman@gmail.com}
 
-\revision{00/00/0000}{-}{Entrega del TP}
+\revision{09/04/2019}{-}{Entrega del TP}
 
 \maketitle
 
@@ -33,18 +33,12 @@ El siguiente trabajo práctico tiene como objetivo familiarizarse con el emulado
 
 
 \section{Introducción}
-...
-
+Los archivos de texto requieren de un carácter especial (o secuencia de caracteres) para indicar el fin de una línea. La codificación de este varía según el sistema operativo, lo que lleva a la incorrecta visualización de un archivo en un sistema operativo que fue creado en otro. Linux utiliza el salto de línea \verb|(\n)| mientras que Windows utiliza el retorno del carro seguido del salto de línea \verb|(\r\n)|.
 
 \section{Desarrollo}
 
-El algoritmo propuesto por el grupo consiste en recorrer caracter por caracter hasta encontrar un \verb|\r| o un \verb|\n|, si el programa usado es dos2unix se elimnara el \verb|\r|, si se usa el programa unix2dos se agregara \verb|\n| despues del \verb|\r|, esto se realiza ya sea desde el archivo o utilizando el stream leído por entrada standard.
+El algoritmo propuesto por el grupo consiste en recorrer caracter por caracter hasta encontrar un \verb|\r|, si el programa usado es dos2unix y el siguiente caracter es un \verb|\n| se elimnara el \verb|\r| , si en cambio se usa el programa unix2dos se agregara \verb|\r| antes de un \verb|\n|, esto se realiza ya sea desde el archivo o utilizando el stream leído por entrada standard.
 
-\textasciitilde
-
-\textasciicircum
-
-\textbackslash
 
 \subsection{Comandos para compilar y ejecutar el programa}
 
@@ -94,8 +88,8 @@ Pueden utilizarse comandos tales como help y version, de la siguiente forma:
 \end{lstlisting}
 
 \subsection{Código fuente de unix2dos.c}
+\lstset{breaklines=true}
 \begin{lstlisting}[language=C]
-
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
@@ -134,14 +128,12 @@ int processInput(FILE *inputFile, FILE *outputFile) {
         fprintf(stderr, "Error fclose: %s\n", strerror( errno ));
         return ERROR;
     }
-
     if(outputFile != stdout){
         if(fclose(outputFile)==EOF){
             fprintf(stderr, "Error fclose: %s\n", strerror( errno));
             return ERROR;
         }
     }
-
     return SALIDA_EXITOSA;
 }
 
@@ -178,39 +170,37 @@ int main(int argc, char *argv[]) {
                 return 0;
             case 'i':
             	if(strcmp(optarg, "-") != 0){
-					inputFile = fopen(optarg, "r");
-					if (inputFile == NULL) {
-						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
-					}
+            		inputFile = fopen(optarg, "r");
+            		if(inputFile == NULL){
+            			fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
+            			return ERROR;
+            		}
             	}
                 break;
             case 'o':
             	if(strcmp(optarg, "-") != 0){
-					outputFile = fopen(optarg, "w+");
-					if (outputFile == NULL) {
-						fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
-						return ERROR;
-					}
+            		outputFile = fopen(optarg, "w+");
+            		if(outputFile == NULL) {
+            			fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
+            			return ERROR;
+            		}
             	}
                 break;
             default:
-                // así está en el manual de getopt
+                // asi esta en el manual de getopt
                 abort();
         }
     }
 
-    if (inputFile == NULL) {
+    if(inputFile == NULL) {
         inputFile = stdin;
     }
-
-    if (outputFile == NULL) {
+    if(outputFile == NULL) {
         outputFile = stdout;
     }
-
-    if (processInput(inputFile, outputFile) == ERROR) {
+    if(processInput(inputFile, outputFile) == ERROR) {
     	return ERROR;
     }
-
     return SALIDA_EXITOSA;
 }
 
@@ -253,19 +243,16 @@ int processInput(FILE *inputFile, FILE *outputFile) {
             fprintf(outputFile,"%c",c);
         }
     }
-
     if(fclose(inputFile)==EOF){
         fprintf(stderr, "Error fclose: %s\n", strerror( errno ));
         return ERROR;
     }
-
     if(outputFile != stdout){
         if(fclose(outputFile)==EOF){
             fprintf(stderr, "Error fclose: %s\n", strerror( errno));
             return ERROR;
         }
     }
-
     return SALIDA_EXITOSA;
 }
 
@@ -302,39 +289,36 @@ int main(int argc, char *argv[]) {
                 return 0;
             case 'i':
             	if(strcmp(optarg, "-") != 0){
-					inputFile = fopen(optarg, "r");
-					if (inputFile == NULL) {
-						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
-					}
+            		inputFile = fopen(optarg, "r");
+            		if(inputFile == NULL) {
+            			fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
+            			return ERROR;
+            		}
             	}
                 break;
             case 'o':
             	if(strcmp(optarg, "-") != 0){
-					outputFile = fopen(optarg, "w+");
-					if (outputFile == NULL) {
-						fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
-						return ERROR;
-					}
+            		outputFile = fopen(optarg, "w+");
+            		if(outputFile == NULL) {
+            			fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
+            			return ERROR;
+            		}
             	}
                 break;
             default:
-                // así está en el manual de getopt
+                // asi esta en el manual de getopt
                 abort();
         }
     }
-
-    if (inputFile == NULL) {
+    if(inputFile == NULL) {
         inputFile = stdin;
     }
-
-    if (outputFile == NULL) {
+    if(outputFile == NULL) {
         outputFile = stdout;
     }
-
-    if (processInput(inputFile, outputFile) == ERROR) {
+    if(processInput(inputFile, outputFile) == ERROR) {
     	return ERROR;
     }
-
     return SALIDA_EXITOSA;
 }
 
@@ -342,7 +326,38 @@ int main(int argc, char *argv[]) {
 
 \section{Casos de prueba}
 
-..........
+A continuación se muestran unos casos de prueba desde la consola del GXEmul.
+
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{/casos-prueba/docLinux-aplicarle-unix2dos-salida-archivo.png}
+\caption{Prueba de transformar un archivo UNIX a Windows, utilizando archivo de entrada y salida.} \label{fig001}
+\end{center}
+\end{figure}
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{/casos-prueba/docLinux-aplicarle-unix2dos-salida-estandar.png}
+\caption{Prueba de transformar un arhivo UNIX a Windows, utilizando solamente archivo de entrada.} \label{fig001}
+\end{center}
+\end{figure}
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{/casos-prueba/docWin-aplicarle-dos2unix-salida-estandar.png}
+\caption{Prueba de transformar un archivo Windows a UNIX, utilizando solo archivo de entrada.} \label{fig001}
+\end{center}
+\end{figure}
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{/casos-prueba/docWin-aplicarle-unix2Dos-salida-estandar.png}
+\caption{Prueba de transformar un archivo Windows a un archivo Windows, la salida es la misma.} \label{fig001}
+\end{center}
+\end{figure}
+
+\pagebreak
 
 \section{Código MIPS generado} 
 
@@ -1225,10 +1240,10 @@ $L28:
 
 El trabajo práctico nos resultó interesante, no por el programa a desarrollar en sí, sino por lo que representó trabajar con el emulador GXEmul, emular la arquitectura MIPS, crear el túnel de comunicación entre el host OS (Linux, distribución Ubuntu) y el guest OS (NetBSD). Aprendimos como transferir archivos entre ambos sistemas y también ciertas cuestiones del lenguaje C con el cual no estábamos toalmente familiarizados.
 
-\begin{thebibliography}{1}
+\begin{thebibliography}{2}
 
-\bibitem{lib} GetOpt library, https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html.
-
+\bibitem{lib} GetOpt library, 
+\texttt{https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html.}
 
 \bibitem{stack} StackOverflow, https://www.stackoverflow.com.
 

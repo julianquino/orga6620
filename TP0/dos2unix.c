@@ -82,15 +82,16 @@ int main(int argc, char *argv[]) {
             case 'i':
             	if(strcmp(optarg, "-") != 0){
 					inputFile = fopen(optarg, "r");
-					if (inputFile == NULL) {
+					if(inputFile == NULL) {
 						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
+						return ERROR;
 					}
             	}
                 break;
             case 'o':
             	if(strcmp(optarg, "-") != 0){
 					outputFile = fopen(optarg, "w+");
-					if (outputFile == NULL) {
+					if(outputFile == NULL) {
 						fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
 						return ERROR;
 					}
@@ -102,15 +103,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (inputFile == NULL) {
+    if(inputFile == NULL) {
         inputFile = stdin;
     }
 
-    if (outputFile == NULL) {
+    if(outputFile == NULL) {
         outputFile = stdout;
     }
 
-    if (processInput(inputFile, outputFile) == ERROR) {
+    if(processInput(inputFile, outputFile) == ERROR) {
     	return ERROR;
     }
 

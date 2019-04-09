@@ -83,6 +83,7 @@ int main(int argc, char *argv[]) {
 					inputFile = fopen(optarg, "r");
 					if (inputFile == NULL) {
 						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
+						return ERROR;
 					}
             	}
                 break;
