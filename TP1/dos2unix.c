@@ -25,23 +25,23 @@
 #define ARCHIVO_SALIDA 1
 #define TAMANIO_BUFFER 1
 
-int myRead(char *buffer){
+extern myRead(char *buffer);/*{
 	int size_byte=read(ARCHIVO_ENTRADA,buffer,TAMANIO_BUFFER);
 	if (size_byte < 0 ){
 		//error ver que tipo de error
 		exit(0);
 	}
 	return size_byte;
-}
-int myWrite(char *buffer,int tamanio){
+}*/
+extern int myWrite(char *buffer,int tamanio);/*{
 	int size_byte=write(ARCHIVO_SALIDA,buffer,tamanio);
 		if (size_byte < 0 ){
 			//error ver que tipo de error
 			exit(0);
 		}
 	return size_byte;
-}
-int processInput() {
+}*/
+extern int processInput();/* {
 	unsigned char buffer;
 	int tamanio=myRead(&buffer);
     while(tamanio>0){
@@ -61,7 +61,7 @@ int processInput() {
         tamanio=myRead(&buffer);
     }
     return SALIDA_EXITOSA;
-}
+}*/
 //**********************************FIN ASSEMBLER****************************
 
 
@@ -122,15 +122,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if(inputFile == NULL) {
+    if(inputFile == NULL){
         inputFile = stdin;
     }
 
-    if(outputFile == NULL) {
+    if(outputFile == NULL){
         outputFile = stdout;
     }
-
-    if(processInput() == ERROR) {
+    if(processInput() == ERROR){
     	return ERROR;
     }
 
