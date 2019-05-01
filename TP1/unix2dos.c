@@ -22,11 +22,9 @@
 
 //********************************CODIGO EN ASSEMBLER***********************
 //esto en el .S
-#define ARCHIVO_ENTRADA 0
-#define ARCHIVO_SALIDA 1
-#define TAMANIO_BUFFER 1
 
-extern int myRead(char *buffer);/*{
+//extern int myRead(char *buffer);
+/*{
 	int size_byte=read(ARCHIVO_ENTRADA,buffer,TAMANIO_BUFFER);
 	if (size_byte < 0 ){
 		//error ver que tipo de error
@@ -34,7 +32,8 @@ extern int myRead(char *buffer);/*{
 	}
 	return size_byte;
 }*/
-extern int myWrite(char *buffer,int tamanio);/*{
+//extern int myWrite(char *buffer,int tamanio);
+/*{
 	int size_byte=write(ARCHIVO_SALIDA,buffer,tamanio);
 		if (size_byte < 0 ){
 			//error ver que tipo de error
@@ -42,7 +41,8 @@ extern int myWrite(char *buffer,int tamanio);/*{
 		}
 	return size_byte;
 }*/
-extern int processInput();/*{
+//extern int processInput();
+/*{
 	unsigned char buffer;
 	int tamanio=myRead(&buffer);
     while(tamanio>0){
@@ -66,74 +66,71 @@ extern int processInput();/*{
 }*/
 //*********************************FIN DE ASSEMBLER************************
 
-
-
 int main(int argc, char *argv[]) {
-    int option = 0;
-    const char *short_opt = "i:o:hV";
-    struct option long_opt[] = {
-            {"version", no_argument,       NULL, 'V'},
-            {"help",    no_argument,       NULL, 'h'},
-            {"input",   required_argument, NULL, 'i'},
-            {"output",  required_argument, NULL, 'o'},
-            {NULL, 0,                      NULL, 0}
-    };
-    FILE *inputFile = NULL;
-    FILE *outputFile = NULL;
+	int option = 0;
+	const char *short_opt = "i:o:hV";
+	struct option long_opt[] = {
+			{"version", no_argument,       NULL, 'V'},
+			{"help",    no_argument,       NULL, 'h'},
+			{"input",   required_argument, NULL, 'i'},
+			{"output",  required_argument, NULL, 'o'},
+			{NULL, 0,                      NULL, 0}
+	};
+	FILE *inputFile = NULL;
+	FILE *outputFile = NULL;
 
-    while ((option = getopt_long(argc, argv, short_opt, long_opt, NULL)) != -1) {
-        switch (option) {
-            case 'V':
-                printf("TP #0 de la materia Organización de Computadoras \n");
-                printf("Alumnos: \n");
-                printf("	Bobadilla Catalan German\n	Del Carril Manuel \n	Quino Lopez Julian \n");
-                return 0;
-            case 'h':
-                printf("Usage: \n");
-                printf("	%s -h \n", argv[0]);
-                printf("	%s -V \n", argv[0]);
-                printf("	%s [options] \n", argv[0]);
-                printf("Options: \n");
-                printf("	-V, --version  Print version and quit. \n");
-                printf("	-h, --help     Print this information. \n");
-                printf("	-o, --output   Location of the output file. \n");
-                printf("	-i, --input    Location of the input file. \n");
-                return 0;
-            case 'i':
-            	if(strcmp(optarg, "-") != 0){
+	while ((option = getopt_long(argc, argv, short_opt, long_opt, NULL)) != -1) {
+		switch (option) {
+			case 'V':
+				printf("TP #0 de la materia Organización de Computadoras \n");
+				printf("Alumnos: \n");
+				printf("	Bobadilla Catalan German\n	Del Carril Manuel \n	Quino Lopez Julian \n");
+				return 0;
+			case 'h':
+				printf("Usage: \n");
+				printf("	%s -h \n", argv[0]);
+				printf("	%s -V \n", argv[0]);
+				printf("	%s [options] \n", argv[0]);
+				printf("Options: \n");
+				printf("	-V, --version  Print version and quit. \n");
+				printf("	-h, --help     Print this information. \n");
+				printf("	-o, --output   Location of the output file. \n");
+				printf("	-i, --input    Location of the input file. \n");
+				return 0;
+			case 'i':
+				if(strcmp(optarg, "-") != 0){
 					inputFile = fopen(optarg, "r");
-					if (inputFile == NULL) {
+					if(inputFile == NULL){
 						fprintf(stderr, "Error archivo entrada: %s\n", strerror(errno));
 						return ERROR;
 					}
-            	}
-                break;
-            case 'o':
-            	if(strcmp(optarg, "-") != 0){
+				}
+				break;
+			case 'o':
+				if(strcmp(optarg, "-") != 0){
 					outputFile = fopen(optarg, "w+");
-					if (outputFile == NULL) {
+					if(outputFile == NULL) {
 						fprintf(stderr, "Error archivo salida: %s\n", strerror(errno));
 						return ERROR;
 					}
-            	}
-                break;
-            default:
-                // así está en el manual de getopt
-                abort();
-        }
-    }
+			}
+			break;
+		default:
+			// así está en el manual de getopt
+			abort();
+		}
+	}
 
-    if (inputFile == NULL) {
-        inputFile = stdin;
-    }
+	if(inputFile == NULL){
+		inputFile = stdin;
+	}
 
-    if (outputFile == NULL) {
-        outputFile = stdout;
-    }
+	if(outputFile == NULL){
+		outputFile = stdout;
+	}
+	if(processInput() == ERROR){
+		return ERROR;
+	}
 
-    if (processInput() == ERROR) {
-    	return ERROR;
-    }
-
-    return SALIDA_EXITOSA;
+	return SALIDA_EXITOSA;
 }
