@@ -39,6 +39,17 @@ Los archivos de texto requieren de un carácter especial (o secuencia de caracte
 
 El algoritmo propuesto por el grupo consiste en recorrer caracter por caracter hasta encontrar un \verb|\r|, si el programa usado es dos2unix y el siguiente caracter es un \verb|\n| se eliminará el \verb|\r| , si en cambio se usa el programa unix2dos se agregara \verb|\r| antes de un \verb|\n|, esto se realiza ya sea desde el archivo o utilizando el stream leído por entrada standard.
 
+\subsection{Implementación}
+
+En ambos programas la implementación es similar, simplemente difieren en los caracteres que detectan y los que reemplazan. Por ende, la siguiente descripción servirá para ambos casos. Tenemos cuatro funcioes globales: myRead, myWrite, processInput y main, cada cual con tareas específicas.
+
+
+myRead se encarga de leer los caracteres del documento y los devuelve, verificando previamente de que no haya errores. Por otro lado, myWrite funciona como myRead, solo que como su nombre lo indica, escribe un caracter en el documento.
+
+processInput utiliza estas dos funciones para procesar el archivo caracter a caracter y escribir el resultado.
+
+main es como su nombre indica, la función que inicia el programa y se encarga de recibir los comandos pasados por stdin y actuar en consecuencia, donde en caso de ser necesario llamará a processInput.
+
 
 \subsection{Comandos para compilar y ejecutar el programa}
 
