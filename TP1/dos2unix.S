@@ -132,7 +132,16 @@ while:
 	jal		myRead
 	sw 		v0,4($fp)
 
+	#-if(tamanio == 0){
+	bgtz 	v0,fijarseSaltoLinea
 
+    #fprintf(outputFile,"\r")
+    la		a0,saltoCarro
+	li		a1,1
+	lw		a2,12($fp)
+	jal		myWrite
+	b		salidaDeProcessInput
+fijarseSaltoLinea:
 	#-if(buffer=='\n')
 	lw		a0,0($fp)
 	sll		a0,a0,24
