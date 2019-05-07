@@ -6,7 +6,8 @@
 #define ARCHIVO_NULO -1
 #define ENTRADA_ESTANDAR 0
 #define SALIDA_ESTANDAR 1
-	#int myRead(char *buffer,int cantidad,file)
+
+	#int myRead(file,buffer,cantidad)
 	.text
 	.align	2
 	.globl	myRead
@@ -21,12 +22,15 @@ myRead:
 	.cprestore  16
 	sw		$fp,20(sp)
 	move	$fp,sp
-	sw		ra,12($fp)
+	sw		ra,24($fp)
 
-	move	t0,a1
-	move	a1,a0
-	move	a0,a2
-	move	a2,t0
+	sw		a0,0($fp)
+	sw		a1,4($fp)
+	sw		a2,8($fp)
+
+	lw		a0,0($fp)
+	lw		a1,4($fp)
+	lw		a2,8($fp)
 	li		v0,SYS_read
 	syscall
 	#vemos si hay errores primero
@@ -38,14 +42,14 @@ ErrorEnRead:
 	li	a0, ERROR
 	syscall
 salidaDeMyRead:
-	lw		ra,12($fp)
-	lw		$fp, 20(sp)
-	addu	sp, sp, 32
+	lw		ra,24($fp)
+	lw		$fp,20(sp)
+	addu	sp, sp,32
 	j		ra
 	.end	myRead
 
 
-#int myWrite(char *buffer, int cantidad,file)
+#int myWrite(file, buffer,cantidad)
 	.text
 	.align	2
 	.globl	myWrite
@@ -60,12 +64,15 @@ myWrite:
 	.cprestore  16
 	sw		$fp,20(sp)
 	move	$fp,sp
-	sw		ra,12($fp)
+	sw		ra,24($fp)
 
-	move	t0,a1
-	move	a1,a0
-	move	a0,a2
-	move	a2,t0
+	sw		a0,0($fp)
+	sw		a1,4($fp)
+	sw		a2,8($fp)
+
+	lw		a0,0($fp)
+	lw		a1,4($fp)
+	lw		a2,8($fp)
 	li		v0,SYS_write
 	syscall
 	#vemos si hay errores primero
@@ -77,7 +84,7 @@ ErrorEnWrite:
 	li	a0, ERROR
 	syscall
 salidaDeMyWrite:
-	lw		ra,12($fp)
+	lw		ra,24($fp)
 	lw		$fp, 20(sp)
 	addu	sp, sp, 32
 	j		ra
@@ -90,105 +97,111 @@ salidaDeMyWrite:
 	.globl	processInput
 	.ent	processInput
 processInput:
-	.frame	$fp,32,ra
+	.frame	$fp,40,ra
 	.set	noreorder
 	.cpload	t9
 	.set	reorder
 
-	subu	sp,sp,32
-	.cprestore  16
-	sw		$fp,20(sp)
+	subu	sp,sp,40
+	.cprestore  24
+	sw		$fp,28(sp)
 	move	$fp,sp
-	sw		ra,24($fp)
-	sw		a0,8($fp)
-	sw		a1,12($fp)
-	sw 		zero,0($fp)
+	sw		ra,32($fp)
+	sw 		zero,4($fp)
 
-	#int tamanio=myRead(&buffer,cantidad,file);
-	move	a0,$fp
-	li		a1,1
-	lw		a2,8($fp)
+	#int tamanio=myRead(file,&buffer,cantidad);
+	lw		a0,40($fp)
+	sw		a0,0($fp)
+	addu	a1,$fp,4
+	li		a2,1
 	jal		myRead
-	sw 		v0,4($fp)
+	sw 		v0,16($fp)
 while:
-	lw		v0,4($fp)
+	lw		v0,16($fp)
 	blez 	v0,salidaDeProcessInput
 
 	# -if(buffer=='\r')
-	lw 		a0,0($fp)
+	lw 		a0,4($fp)
 	sll		a0,a0,24
 	sra		a0,a0,24
 
 	li		t0,13
 	bne		a0,	t0,verSiHaySaltoDeLinea
 
-	#tamanio=myRead(&buffer,cantidad,file);
-	move	a0,$fp
-	li		a1,1
-	lw		a2,8($fp)
+	#int tamanio=myRead(file,&buffer,cantidad);
+	lw		a0,40($fp)
+	sw		a0,0($fp)
+	addu	a1,$fp,4
+	li		a2,1
 	jal		myRead
-	sw 		v0,4($fp)
+	sw 		v0,16($fp)
 
 	#-if(tamanio == 0){
 	bgtz 	v0,fijarseSaltoLinea
 
     #fprintf(outputFile,"\r")
-    la		a0,saltoCarro
-	li		a1,1
-	lw		a2,12($fp)
+    lw		a0,44($fp)
+	sw		a0,0($fp)
+	addu	a1,$fp,4
+	li		a2,1
 	jal		myWrite
 	b		salidaDeProcessInput
 fijarseSaltoLinea:
 	#-if(buffer=='\n')
-	lw		a0,0($fp)
+	lw		a0,4($fp)
 	sll		a0,a0,24
 	sra		a0,a0,24
 	li		t0,10
 	bne		a0,	t0,escribirRetornoDeCarro
 escribirSaltoYcarro:
-	#myWrite("\r\n", 2,file);
-	la		a0,saltoCarro
-	li		a1,1
-	lw		a2,12($fp)
+	#myWrite(file,"\r\n",cantidad);
+	lw		a0,44($fp)
+	sw		a0,0($fp)
+	la		a1,saltoCarro
+	li		a2,1
 	jal		myWrite
-	la		a0,saltoLinea
-	li		a1,1
-	lw		a2,12($fp)
+	lw		a0,44($fp)
+	sw		a0,0($fp)
+	la		a1,saltoLinea
+	li		a2,1
 	jal		myWrite
 	b		obtenerCaracter
 verSiHaySaltoDeLinea:
 	#-else if(buffer=='\n')
-	lw		a0,0($fp)
+	lw		a0,4($fp)
 	sll		a0,a0,24
 	sra		a0,a0,24
 	li		t0,10
 	bne		a0,	t0,escribirElCaracter
 	b		escribirSaltoYcarro
 escribirRetornoDeCarro:
-	#myWrite("\r", 1,file);
-	la		a0,saltoCarro
-	li		a1,1
-	lw		a2,12($fp)
+	#myWrite(file,"\r",cantidad);
+	lw		a0,44($fp)
+	sw		a0,0($fp)
+	la		a1,saltoCarro
+	li		a2,1
 	jal		myWrite
 escribirElCaracter:
-	#myWrite(&buffer, 2,file);
-	move	a0,$fp
-	li		a1,1
-	lw		a2,12($fp)
+	#myWrite(file,&buffer,cantidad);
+	lw		a0,44($fp)
+	sw		a0,0($fp)
+	addu	a1,$fp,4
+	li		a2,1
 	jal		myWrite
 obtenerCaracter:
 	#tamanio=myRead(&buffer,cantidad,file);
-	move	a0,$fp
-	li		a1,1
-	lw		a2,8($fp)
+	lw		a0,40($fp)
+	sw		a0,0($fp)
+	addu	a1,$fp,4
+	li		a2,1
 	jal		myRead
-	sw 		v0,4($fp)
+	sw 		v0,16($fp)
 	b 		while
 salidaDeProcessInput:
-	li 		v0,0
-	lw		ra,24($fp)
-	lw		$fp, 20(sp)
-	addu	sp, sp, 32
+	li 		v0,SALIDA_EXITOSA
+	lw		ra,32($fp)
+	lw		$fp, 28(sp)
+	addu	sp, sp, 40
 	j		ra
 	.end	processInput
 
@@ -200,43 +213,44 @@ salidaDeProcessInput:
 	.globl	main
 	.ent	main
 main:
-	.frame	$fp,80,ra
+	.frame	$fp,64,ra
 	.set	noreorder
 	.cpload	t9
 	.set	reorder
 
-	subu	sp,sp,80
-	.cprestore  16
-	sw		$fp,20(sp)
+	subu	sp,sp,64
+	.cprestore  48
+	sw		$fp,52(sp)
 	move	$fp,sp
-	sw		ra,12($fp)
-	sw		a0,32($fp)
-	sw		a1,36($fp)
-	sw		s0,52($fp)
-	sw		s1,56($fp)
+	sw		ra,56($fp)
+	sw		a0,36($fp)
+	sw		a1,40($fp)
+
+	#sw		s0,52($fp)
+	#sw		s1,56($fp)
 	#int option = 0;
-	sw 		zero,40($fp)
+	sw 		zero,16($fp)
 
 	#const char *short_opt = "i:o:hV";
 	la		t0,short_opt
-	sw		t0,44($fp)
+	sw		t0,20($fp)
 
 	#struct option long_opt[] =
 	la		t0,long_opt
-	sw		t0,48($fp)
+	sw		t0,24($fp)
 
 	#FILE *inputFile = NULL;
 	#FILE *outputFile = NULL;
 	li		t0,ARCHIVO_NULO
-	move	s0,t0
-	move	s1,t0
+	sw		t0,28($fp)
+	sw		t0,32($fp)
 
 	#while ((option = getopt_long(argc, argv, short_opt, long_opt, NULL)) != -1)
 while_option:
-	lw		a0,32($fp)
-	lw		a1,36($fp)
-	lw		a2,44($fp)
-	lw		a3,48($fp)
+	lw		a0,36($fp)
+	lw		a1,40($fp)
+	lw		a2,20($fp)
+	lw		a3,24($fp)
 	jal		getopt_long
 
 	li		t0,-1
@@ -281,7 +295,7 @@ case_i:
 	#-if(inputFile == NULL)
 	bltz	v0,errorEnArchivoInput
 	bnez    a3,errorEnArchivoInput
-	move	s0,v0
+	sw		v0,28($fp)
 	b		while_option
 errorEnArchivoInput:
 	li		v0,SYS_exit
@@ -307,7 +321,7 @@ case_o:
 	#-if(inputFile == NULL)
 	bltz	v0,errorEnArchivoOutput
 	bnez    a3,errorEnArchivoOutput
-	move	s1,v0
+	sw		v0,32($fp)
 	b		while_option
 errorEnArchivoOutput:
 	li		v0,SYS_exit
@@ -319,8 +333,12 @@ case_default:
 	b		salir
 
 salirDeWhile:
-	sw		s0,0($fp)
-	sw		s1,4($fp)
+	lw		t0,28($fp)
+	sw		t0,0($fp)
+	lw		t0,32($fp)
+	sw		t0,4($fp)
+	#sw		s0,0($fp)
+	#sw		s1,4($fp)
 
 	#-if(inputFile == NULL){
 	li		t0,ARCHIVO_NULO
@@ -358,11 +376,9 @@ closeOutput:
     syscall
 salir:
 	li		v0,SALIDA_EXITOSA
-	lw		ra,12($fp)
-	lw		s0,52($fp)
-	lw		s1,56($fp)
-	lw		$fp, 20(sp)
-	addu	sp, sp, 80
+	lw		ra,56($fp)
+	lw		$fp, 52(sp)
+	addu	sp, sp, 64
 	j		ra
 	.end	main
 
